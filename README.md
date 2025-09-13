@@ -1,10 +1,16 @@
 # RAG ChatBot — LangChain + ChatGPT
 
 A simple Retrieval-Augmented Generation (RAG) chatbot built with Streamlit, LangChain and OpenAI. Upload documents (PDF, DOCX, TXT, CSV, JSON), the app builds embeddings with a small HuggingFace model, stores vectors in a local Chroma vector store and lets you chat with your documents via a conversational retrieval chain.
+
+
 <img width="1792" height="832" alt="image" src="https://github.com/user-attachments/assets/81e4d6de-84cb-4f5c-bd61-7a45824c46f9" />
 
 
 ---
+
+## Demo video
+
+https://drive.google.com/file/d/1FKtvLheESMe9KwJMrzPEltk5tPhWEF23/view?usp=sharing
 
 ## Key features
 
@@ -75,9 +81,7 @@ Open the URL printed by Streamlit (usually `http://localhost:8501`).
 
 ---
 
-## Demo video
 
-https://drive.google.com/file/d/1FKtvLheESMe9KwJMrzPEltk5tPhWEF23/view?usp=sharing
 
 
 ## How it works (high level)
