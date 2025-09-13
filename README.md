@@ -1,16 +1,21 @@
 # RAG ChatBot — LangChain + ChatGPT
 
-A simple Retrieval-Augmented Generation (RAG) chatbot built with Streamlit, LangChain and OpenAI. Upload documents (PDF, DOCX, TXT), the app builds embeddings with a small HuggingFace model, stores vectors in a local Chroma vector store and lets you chat with your documents via a conversational retrieval chain.
+A simple Retrieval-Augmented Generation (RAG) chatbot built with Streamlit, LangChain and OpenAI. Upload documents (PDF, DOCX, TXT, CSV, JSON), the app builds embeddings with a small HuggingFace model, stores vectors in a local Chroma vector store and lets you chat with your documents via a conversational retrieval chain.
 
 ---
 
 ## Key features
 
-- Upload multiple documents (PDF, DOCX, TXT)
+- Upload multiple documents (PDF, DOCX, TXT, CSV, JSON)
 - Chunking and embedding using `sentence-transformers/all-MiniLM-L6-v2`
 - Local Chroma vector store persisted under `chroma_store/`
 - ConversationalRetrievalChain with a ChatOpenAI LLM (configurable model)
 - Simple Streamlit UI for uploading, processing and chatting
+
+Additional supported formats
+
+- CSV: parsed row-by-row into plain text (comma-separated) and indexed as documents. If parsing fails (malformed CSV or encoding issues), the raw file text is used as a fallback.
+- JSON: pretty-printed and indexed as text. If JSON parsing fails, the raw file text is used as a fallback.
 
 ---
 
@@ -71,10 +76,12 @@ Open the URL printed by Streamlit (usually `http://localhost:8501`).
 ## How it works (high level)
 
 1. Upload documents in the left column.
-2. Files are temporarily written to disk and read via appropriate loaders:
+2. Files are temporarily written to disk and read via appropriate loaders or parsers:
    - PDFs: `PyPDFLoader`
    - DOC/DOCX: `Docx2txtLoader`
    - TXT: `TextLoader`
+   - CSV: parsed into text rows and wrapped into LangChain `Document` objects (falls back to raw text on error)
+   - JSON: pretty-printed JSON is used as document text (falls back to raw text on error)
 3. Extracted text is split into chunks (768 chars, overlap 128) via `CharacterTextSplitter`.
 4. Embeddings generated using `HuggingFaceEmbeddings` (MiniLM) and stored in Chroma.
 5. A `ConversationalRetrievalChain` is created with a `ChatOpenAI` LLM and a conversation memory.
@@ -106,6 +113,9 @@ Open the URL printed by Streamlit (usually `http://localhost:8501`).
 - `PermissionError` when creating temp files: run VS Code/PowerShell with appropriate permissions or choose a different temp dir.
 - Long processing times: embeddings are computed on CPU by default; switch to a GPU device in `HuggingFaceEmbeddings(model_kwargs={"device": "cuda"})` if available.
 - Chat output empty or errors from OpenAI: verify `OPENAI_API_KEY` and network access.
+- Chat output empty or errors from OpenAI: verify `OPENAI_API_KEY` and network access.
+
+- CSV/JSON parsing issues: the app attempts to parse CSV rows and pretty-print JSON before indexing; if parsing fails due to malformed content or encoding problems, the raw file contents are indexed instead. For best results ensure CSV files are well-formed and JSON files are valid UTF-8.
 
 ---
 
