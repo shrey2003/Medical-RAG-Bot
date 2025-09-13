@@ -1,1 +1,124 @@
-# Medical-RAG-Bot
+# RAG ChatBot — LangChain + ChatGPT
+
+A simple Retrieval-Augmented Generation (RAG) chatbot built with Streamlit, LangChain and OpenAI. Upload documents (PDF, DOCX, TXT), the app builds embeddings with a small HuggingFace model, stores vectors in a local Chroma vector store and lets you chat with your documents via a conversational retrieval chain.
+
+---
+
+## Key features
+
+- Upload multiple documents (PDF, DOCX, TXT)
+- Chunking and embedding using `sentence-transformers/all-MiniLM-L6-v2`
+- Local Chroma vector store persisted under `chroma_store/`
+- ConversationalRetrievalChain with a ChatOpenAI LLM (configurable model)
+- Simple Streamlit UI for uploading, processing and chatting
+
+---
+
+## Files of interest
+
+- `app.py` — main Streamlit app
+- `requirements.txt` — Python dependencies
+- `chroma_store/` — persisted vector store and related files (generated at runtime)
+- `.env` — environment file (contains `OPENAI_API_KEY`) — **do not commit**
+
+---
+
+## Setup (Windows PowerShell)
+
+1. Clone the repo and open in VS Code (or your editor)
+
+2. Create and activate a virtual environment (PowerShell):
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks scripts, run as admin and do:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+3. Install dependencies:
+
+```powershell
+pip install -r requirements.txt
+```
+
+4. Create a `.env` file at the project root containing your OpenAI key:
+
+```text
+OPENAI_API_KEY="sk-..."
+```
+
+> Important: rotate keys if you accidentally commit them.
+
+---
+
+## Run
+
+From the project root (with venv active):
+
+```powershell
+streamlit run app.py
+```
+
+Open the URL printed by Streamlit (usually `http://localhost:8501`).
+
+---
+
+## How it works (high level)
+
+1. Upload documents in the left column.
+2. Files are temporarily written to disk and read via appropriate loaders:
+   - PDFs: `PyPDFLoader`
+   - DOC/DOCX: `Docx2txtLoader`
+   - TXT: `TextLoader`
+3. Extracted text is split into chunks (768 chars, overlap 128) via `CharacterTextSplitter`.
+4. Embeddings generated using `HuggingFaceEmbeddings` (MiniLM) and stored in Chroma.
+5. A `ConversationalRetrievalChain` is created with a `ChatOpenAI` LLM and a conversation memory.
+6. The chat UI sends queries to the chain; results are returned and stored in Streamlit session state.
+
+---
+
+## Design choices (short explanation)
+
+- Local, small embedding model (`all-MiniLM-L6-v2`) — good accuracy vs cost tradeoff for local CPU inference.
+- Chroma vector store — easy local persistence and fast retrieval for small/medium datasets.
+- `ConversationalRetrievalChain` with memory — maintains chat context for follow-up questions.
+- Streamlit UI — fast to iterate and share; minimal front-end code required.
+- Kept splitting parameters conservative (768 chunk size) to balance context and retrieval quality.
+
+---
+
+## Security & housekeeping
+
+- Remove `.env` from the repository and rotate the OpenAI key if it was committed.
+- If you want a fresh vector store run, remove `chroma_store/` to force re-generation.
+- `.gitignore` includes `chroma_store/` and `.env` to avoid committing them.
+
+---
+
+## Troubleshooting
+
+- Missing dependency errors: ensure the venv is active and `pip install -r requirements.txt` completed.
+- `PermissionError` when creating temp files: run VS Code/PowerShell with appropriate permissions or choose a different temp dir.
+- Long processing times: embeddings are computed on CPU by default; switch to a GPU device in `HuggingFaceEmbeddings(model_kwargs={"device": "cuda"})` if available.
+- Chat output empty or errors from OpenAI: verify `OPENAI_API_KEY` and network access.
+
+---
+
+## Next improvements (suggestions)
+
+- Add ability to select LLM model and configure settings via UI.
+- Add caching of embeddings per file hash to avoid recomputing embeddings for unchanged files.
+- Add unit tests for document loaders and vector store creation.
+- Add an admin panel to inspect the vector store (embeddings count, documents indexed).
+
+---
+
+## License
+
+MIT — adapt as needed.
+
