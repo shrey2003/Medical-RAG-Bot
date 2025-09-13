@@ -77,18 +77,8 @@ Open the URL printed by Streamlit (usually `http://localhost:8501`).
 
 ## Demo video
 
-You can link a demo video hosted on Google Drive. Example link provided by you:
-
 https://drive.google.com/file/d/1FKtvLheESMe9KwJMrzPEltk5tPhWEF23/view?usp=sharing
 
-If you want to embed the Drive video in HTML-capable renderers, use the Drive "preview" URL in an iframe (replace the FILE_ID as needed):
-
-<iframe width="640" height="360" src="https://drive.google.com/file/d/1FKtvLheESMe9KwJMrzPEltk5tPhWEF23/view?usp=sharing" frameborder="0" allowfullscreen></iframe>
-
-Notes:
-- GitHub README rendering strips iframe tags for security, so the iframe above will NOT render on GitHub.com. On GitHub it's best to include the direct link or a screenshot that links to the Drive file.
-- For broader embed support (GitHub, docs sites, and social previews), consider uploading the video to YouTube or Vimeo and then embedding the canonical player URL.
-- If you'd like, I can add a thumbnail image (screenshot) that links to the Drive file instead — provide an image path or I can generate one locally and add it to the repo.
 
 ## How it works (high level)
 
